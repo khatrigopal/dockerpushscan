@@ -36,6 +36,9 @@ jobs:
     - name: Trivy Action
       uses: lazy-actions/gitrivy@v3
       with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
           image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           format: 'table'
           exit-code: '1'
