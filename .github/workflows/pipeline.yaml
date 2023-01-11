@@ -35,7 +35,6 @@ jobs:
         
     - name: Scan image
       uses: anchore/scan-action@v3
-      id: scan
       with:
           image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
           severity: 'CRITICAL,HIGH'
