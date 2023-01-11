@@ -33,21 +33,13 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
         
-    - name: Trivy Action
-      uses: lazy-actions/gitrivy@v3
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
       with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
           image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-          format: table
-          exit-code: 1
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          trivy_version: latest
-          vuln_type: os,library
-          ignore_unfixed: false
-          issue_title: Security Alert
-          issue_label: trivy,vulnerability
-          fail_on_vulnerabilities: false
+          format: 'table'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
