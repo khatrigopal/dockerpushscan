@@ -36,7 +36,7 @@ jobs:
     - name: Scan image
       uses: anchore/scan-action@v3
       with:
-          image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        image: "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TA"
           
     - name: upload Anchore scan SARIF report
       uses: github/codeql-action/upload-sarif@v2
