@@ -33,9 +33,7 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
         
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+    - name: Scan image
+      uses: anchore/scan-action@v3
       with:
-          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+        image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
