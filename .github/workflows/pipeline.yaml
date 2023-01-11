@@ -33,15 +33,12 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         
-    - name: Install Trivy
-      run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
-    
-    # Scan the Image
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
-      continue-on-error: false
       with:
-         image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-         format: 'sarif'
-         output: 'trivy-results.sarif'
+          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
