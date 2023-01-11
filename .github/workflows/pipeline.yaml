@@ -39,4 +39,4 @@ jobs:
       with:
          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
          format: 'sarif'
-         output: 'trivy-results.sarif
+         output: 'trivy-results.sarif'
