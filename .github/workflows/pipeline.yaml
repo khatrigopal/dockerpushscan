@@ -31,12 +31,12 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
         
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
       with:
-          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
           format: 'template'
           template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
