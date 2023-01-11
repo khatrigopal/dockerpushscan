@@ -33,8 +33,8 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+    - name: Trivy Action
+      uses: lazy-actions/gitrivy@v3
       with:
           image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           format: 'table'
