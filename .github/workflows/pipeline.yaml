@@ -33,12 +33,16 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         
-    - name: Scan image
-      uses: anchore/scan-action@v3
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
       with:
-        image: "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TA"
-          
-    - name: upload Anchore scan SARIF report
+          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+    - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v2
       with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
+          sarif_file: 'trivy-results.sarif'
