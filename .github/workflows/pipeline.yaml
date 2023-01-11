@@ -36,7 +36,7 @@ jobs:
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       continue-on-error: false
-        with:
+      with:
          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
          format: 'sarif'
          output: 'trivy-results.sarif
