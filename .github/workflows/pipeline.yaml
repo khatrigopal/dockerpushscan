@@ -31,7 +31,7 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$${{ github.sha }} .
         
     - name: Trivy Action
       uses: lazy-actions/gitrivy@v3
@@ -39,7 +39,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:$${{ github.sha }}
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
