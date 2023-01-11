@@ -38,7 +38,7 @@ jobs:
       uses: aquasecurity/trivy-action@master
       continue-on-error: false
       with:
-         image-ref: ${{ secrets.REPO_NAME }}/$ECR_REPOSITORY:$IMAGE_TAG .
+         image-ref: ${{ secrets.REPO_NAME }}:$IMAGE_TAG
          format: 'sarif'
          output: 'trivy-results.sarif'
          
