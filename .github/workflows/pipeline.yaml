@@ -50,7 +50,7 @@ jobs:
         IMAGE_TAG: latest
       run: |
        #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-        trivy image --format --template @contrib/html.tpl -o scan.html  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+        trivy image --format template @contrib/html.tpl -o scan.html  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
     
     
      
