@@ -53,7 +53,7 @@ jobs:
          #trivy image   --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image   --format json -o result.json  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image   --format template --template "@contrib/html.tpl" -o report.html  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         trivy image   --format hmtl -o report.html  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image   --debug config --format=template --template='@html.tpl' --output 'report.html  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image   --format template --template "@templates/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
