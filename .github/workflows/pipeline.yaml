@@ -66,7 +66,6 @@ jobs:
           account: ${{ secrets.MAIL_ADDRESS }}
           password: ${{ secrets.MAIL_PASSWORD }}
           sender: 'Gopal Khatri'
-          secure: true
           from: ${{ secrets.MAIL_ADDRESS }}
           subject: Github Actions job result
           body: file://README.md
