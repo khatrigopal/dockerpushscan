@@ -59,10 +59,10 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         testResultsFormat: 'JUnit'
-	      testResultsFiles: **/junit-report-high-crit.xml
-	      mergeTestResults: true
-	      failTaskOnFailedTests: false
-	      testRunTitle: 'Trivy - Low and Medium Vulnerabilities'
+	#testResultsFiles: **/junit-report-high-crit.xml
+	mergeTestResults: true
+	failTaskOnFailedTests: false
+	testRunTitle: 'Trivy - Low and Medium Vulnerabilities'
     
      
     - name: PUSH Image to Amazon ECR
