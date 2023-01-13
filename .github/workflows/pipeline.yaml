@@ -50,7 +50,7 @@ jobs:
         IMAGE_TAG: latest
       run: |
          
-         trivy image   --format template --template "@templates/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image   --format template --template "@contrib/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v2
