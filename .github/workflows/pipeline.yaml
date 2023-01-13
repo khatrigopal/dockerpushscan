@@ -51,14 +51,18 @@ jobs:
       run: |
          #trivy image --no-progress --exit-code 0  --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --no-progress --exit-code 1  --format sarif -o trivy-results-docker.sarif  --severity CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         trivy image   --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         #trivy image   --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         #trivy image   --format template --template "@templates/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image   --format template --template "@templates/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
-    - name: Upload Trivy scan results to GitHub Security tab
+    - name: PublishTestResult@2
       uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: 'trivy-results-docker.sarif'
+        testResultsFormat: 'JUnit'
+	      testResultsFiles: **/junit-report-high-crit.xml
+	      mergeTestResults: true
+	      failTaskOnFailedTests: false
+	      testRunTitle: 'Trivy - Low and Medium Vulnerabilities'
     
      
     - name: PUSH Image to Amazon ECR
@@ -68,6 +72,4 @@ jobs:
         IMAGE_TAG: latest
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-        
-
         
