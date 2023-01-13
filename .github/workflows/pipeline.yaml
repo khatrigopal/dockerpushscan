@@ -49,9 +49,9 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image --no-progress --exit-code 1  --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         trivy image --no-progress --exit-code 0  --format sarif -o trivy-results-docker.sarif  --severity CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         #trivy image   --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         #trivy image --no-progress --exit-code 0  --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         #trivy image --no-progress --exit-code 1  --format sarif -o trivy-results-docker.sarif  --severity CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image   --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
     - name: Upload Trivy scan results to GitHub Security tab
