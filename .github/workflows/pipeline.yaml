@@ -2,6 +2,7 @@
 
 name: BuildScanPushDockerImage
 
+
 on:
   push:
     branches: [ main ]
@@ -50,17 +51,27 @@ jobs:
       run: |
          #trivy image --no-progress --exit-code 0  --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --no-progress --exit-code 1  --format sarif -o trivy-results-docker.sarif  --severity CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         #trivy image   --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image   --format sarif -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         trivy image   --format template --template "@templates/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         #trivy image   --format template --template "@templates/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
-    - name: PublishTestResult@2
+    - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v2
       with:
-        testResultsFormat: JUnit
-	mergeTestResults: true
-	failTaskOnFailedTests: false
-	testRunTitle: 'Trivy - Low and Medium Vulnerabilities'
+        sarif_file: 'trivy-results-docker.sarif'
+		
+    - name: Send email
+      uses: devellany/send-mail@v1.0.2
+      with:
+          host: smtp.gmail.com
+          account: ${{secrets.MAIL_ADDRESS}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          sender: devellany
+          from: ${{secrets.MAIL_ADDRESS}}
+          subject: Github Actions job result
+          body: file://README.md
+          attachments: '[{"path":"README.md"}]'
+          to: khatri.gopal@gmail.com
     
      
     - name: PUSH Image to Amazon ECR
