@@ -55,10 +55,10 @@ jobs:
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image   --format template --template "@templates/junit.tpl" -o junit-report-high-crit.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: 'trivy-results-docker.sarif'
+    #- name: Upload Trivy scan results to GitHub Security tab
+     # uses: github/codeql-action/upload-sarif@v2
+      #with:
+       # sarif_file: 'trivy-results-docker.sarif'
     - name: Send email
       uses: devellany/send-mail@v1.0.2
       with:
