@@ -48,13 +48,11 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image --format template --template "@contrib/junit.tpl" -o junit-report.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         #trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: 'trivy-results-docker.sarif'
+    
     - name: Send email
       uses: devellany/send-mail@v1.0.2
       with:
@@ -66,7 +64,7 @@ jobs:
           from: ${{ secrets.MAIL_ADDRESS }}
           subject: Github Actions job result
           body: file://README.md
-          attachments: '[{"path":"trivy-results-docker.sarif"}]'
+          attachments: '[{"path":"junit-report.xml"}]'
           to: abhinava599@gmail.com
     
      
