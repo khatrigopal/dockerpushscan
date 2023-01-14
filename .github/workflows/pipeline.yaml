@@ -1,35 +1,44 @@
 # This is a basic workflow to help you get started with Actions
 
-name: BuildScanPushDockerImage
+name: Deploy to ECR
 
 
+# Controls when the workflow will run
 on:
-  push:
-    branches: [ main ]
-    
+    push:
+       branches: [ master ]
+  
+
+  
 env:
   TRIVY_VERSION: 0.34.0
-  
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
+
 jobs:
-  build_image_push_to_ECR:
-    runs-on: ubuntu-18.04
+  
+  build:
+    
+    name: Build Image
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Checkout
+
+    - name: Check out code
       uses: actions/checkout@v2
-    # see: https://github.com/aws-actions/configure-aws-credentials
-    - name: Configure AWS Credentials
+    
+    - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-    # see: https://github.com/aws-actions/amazon-ecr-login
-    - name: Log in to Amazon ECR
+
+    - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-      
-    - name: Build, tag, and push image to Amazon ECR
+
+    - name: Build and Tag ECR Image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
@@ -37,12 +46,11 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
         
-    
-          
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+        
     - name: Install Trivy
       run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
-          
         
     - name: Image Scan
       env:
@@ -50,25 +58,12 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image --format template --template "../../junit.tpl"  -o report.html --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         #trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         
-   
-    - name: Send email
-      uses: devellany/send-mail@v1.0.2
+       #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+        trivy image --format template --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
       with:
-          host: smtp.gmail.com
-          port: 465
-          account: ${{ secrets.MAIL_ADDRESS }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          sender: 'Gopal Khatri'
-          from: ${{ secrets.MAIL_ADDRESS }}
-          subject: Github Actions job result
-          body: file://README.md
-          #attachments: '[{"path":"README.md"}]'
-          attachments: '[{"path":"report.html"}]'
-          to: awskhatrigcloud@gmail.com
+        sarif_file: 'trivy-results-docker.sarif'
      
     - name: PUSH Image to Amazon ECR
       env:
