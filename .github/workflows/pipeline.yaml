@@ -2,6 +2,7 @@
 
 name: BuildScanPushDockerImage
 
+
 on:
   push:
     branches: [ main ]
@@ -12,7 +13,7 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build_image_push_to_ECR:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -48,26 +49,13 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image --format html -o report.html --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"       
+         trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
-    #- name: Upload Trivy scan results to GitHub Security tab
-     # uses: github/codeql-action/upload-sarif@v2
-      #with:
-       # sarif_file: 'trivy-results-docker.sarif'
-    - name: Send email
-      uses: devellany/send-mail@v1.0.2
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
       with:
-          host: smtp.gmail.com
-          port: 465
-          account: ${{ secrets.MAIL_ADDRESS }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          sender: 'Gopal Khatri'
-          from: ${{ secrets.MAIL_ADDRESS }}
-          subject: Github Actions job result
-          body: file://README.md
-          #attachments: '[{"path":"README.md"}]'
-          attachments: '[{"path":"report.html"}]'
-          to: khatri.gopal@gmail.com
+        sarif_file: 'trivy-results-docker.sarif'
     
      
     - name: PUSH Image to Amazon ECR
@@ -77,4 +65,3 @@ jobs:
         IMAGE_TAG: latest
       run: |
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
- 
