@@ -40,7 +40,8 @@ jobs:
           
     - name: Install Trivy
       run: |
-          curl -sfL https://github.com/aquasecurity/trivy/blob/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
+          https://github.com/aquasecurity/trivy/blob/main/contrib/install.sh  | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
+          # curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
         
     - name: Image Scan
       env:
@@ -48,7 +49,7 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image -d --format template --template "@contrib/junit.tpl" -o junit-report.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image --format template --template "@contrib/junit.tpl" -o junit-report.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
@@ -65,7 +66,7 @@ jobs:
           subject: Github Actions job result
           body: file://README.md
           attachments: '[{"path":"junit-report.xml"}]'
-          to: abhinava599@gmail.com
+          to: khatri.gopal@gmail.com
     
      
     - name: PUSH Image to Amazon ECR
