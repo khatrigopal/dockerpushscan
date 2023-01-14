@@ -66,7 +66,7 @@ jobs:
           from: ${{ secrets.MAIL_ADDRESS }}
           subject: Github Actions job result
           body: file://README.md
-          attachments: '[{"path":"README.md"}]'
+          attachments: '[{"path":"trivy-results-docker.sarif"}]'
           to: abhinava599@gmail.com
     
      
