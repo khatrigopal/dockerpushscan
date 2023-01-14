@@ -7,7 +7,6 @@ on:
     push:
        branches: [ master ]
   
-
   
 env:
   TRIVY_VERSION: 0.34.0
