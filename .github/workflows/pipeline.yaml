@@ -54,11 +54,21 @@ jobs:
          #trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
+   
+    - name: Send email
+      uses: devellany/send-mail@v1.0.2
       with:
-        sarif_file: 'report.html'
-    
+          host: smtp.gmail.com
+          port: 465
+          account: ${{ secrets.MAIL_ADDRESS }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          sender: 'Gopal Khatri'
+          from: ${{ secrets.MAIL_ADDRESS }}
+          subject: Github Actions job result
+          body: file://README.md
+          #attachments: '[{"path":"README.md"}]'
+          attachments: '[{"path":"report.html"}]'
+          to: awskhatrigcloud@gmail.com
      
     - name: PUSH Image to Amazon ECR
       env:
