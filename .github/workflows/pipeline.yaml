@@ -2,6 +2,7 @@
 
 name: BuildScanPushDockerImage
 
+
 on:
   push:
     branches: [ main ]
@@ -40,8 +41,7 @@ jobs:
           
     - name: Install Trivy
       run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/blob/main/contrib/install.sh  | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
-          # curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
         
     - name: Image Scan
       env:
@@ -49,24 +49,13 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image --format template --template "@contrib/junit.tpl" -o junit-report.xml  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-         #trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          
-    
-    - name: Send email
-      uses: devellany/send-mail@v1.0.2
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
       with:
-          host: smtp.gmail.com
-          port: 465
-          account: ${{ secrets.MAIL_ADDRESS }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          sender: 'Gopal Khatri'
-          from: ${{ secrets.MAIL_ADDRESS }}
-          subject: Github Actions job result
-          body: file://README.md
-          attachments: '[{"path":"junit-report.xml"}]'
-          to: khatri.gopal@gmail.com
+        sarif_file: 'trivy-results-docker.sarif'
     
      
     - name: PUSH Image to Amazon ECR
