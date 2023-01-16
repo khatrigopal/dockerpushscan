@@ -58,8 +58,8 @@ jobs:
         sarif_file: 'trivy-results-docker.sarif'
  
   push:
-    uses: ./.github/workflows/wf1.yml
-    needs: build_image_push_to_ECR
+    runs-on: ubuntu-18.04
+    needs: ${{ steps.Build, tag, and push image to Amazon ECR }}
     steps:
       - run: docker push -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
  
