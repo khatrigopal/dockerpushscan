@@ -59,7 +59,7 @@ jobs:
  
   Prod:
     runs-on: ubuntu-20.04
-    needs: bhild
+    needs: build
     environment: test
     steps:
     - name: Check out code
