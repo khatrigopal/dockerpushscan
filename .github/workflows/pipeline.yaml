@@ -9,9 +9,12 @@ on:
    
 env:
   TRIVY_VERSION: 0.34.0
+  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+  IMAGE_TAG: latest
 
 
-jobs:
+jobs
   
   build:
     
@@ -36,39 +39,43 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build and Tag ECR Image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: latest
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+        docker build -t ${{ env.ECR_REGISTRY }} /${{  env.ECR_REPOSITORY }}:${{ github.sha }} .
         
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-        
+              
     - name: Install Trivy
       run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
         
     - name: Image Scan
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: latest
       run: |
-       #trivy image --format template --template "@templates/junit.tpl" -o junit-report-low-med.xml --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-        trivy image --format template --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+       #trivy image --format template --template "@templates/junit.tpl" -o junit-report-low-med.xml --severity HIGH,CRITICAL "${{ env.ECR_REGISTRY }} /${{  env.ECR_REPOSITORY }}:${{ github.sha }}"
+        trivy image --format template --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity HIGH,CRITICAL "${{ env.ECR_REGISTRY }} /${{  env.ECR_REPOSITORY }}:${{ github.sha }}"
   
     - name: Upload Trivy scan results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: 'trivy-results-docker.sarif'
  
-  
-    - name: PUSH Image to Amazon ECR
-      environment: test
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: latest
+  Prod:
+    runs-on: ubuntu-20.04
+    needs: bhild
+    environment: test
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and Tag ECR Image
       run: |
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+        docker build -t ${{ env.ECR_REGISTRY }} /${{  env.ECR_REPOSITORY }}:${{ github.sha }}
