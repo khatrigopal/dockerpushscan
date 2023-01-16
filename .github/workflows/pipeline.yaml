@@ -56,7 +56,12 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: 'trivy-results-docker.sarif'
-    
+ 
+  push:
+    uses: ./.github/workflows/wf1.yml
+    needs: build_image_push_to_ECR
+    steps:
+      - run: docker push -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
  
     
 
