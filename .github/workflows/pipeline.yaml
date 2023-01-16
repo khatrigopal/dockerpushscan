@@ -56,15 +56,5 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: 'trivy-results-docker.sarif'
-    
-  push:
-    runs-on: ubuntu-18.04
-    environment: test
-    steps:
-    - name: PUSH Image to Amazon ECR
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-        IMAGE_TAG: latest
-      run: |
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+  
+
