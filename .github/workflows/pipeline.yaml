@@ -9,8 +9,8 @@ on:
    
 env:
   TRIVY_VERSION: 0.34.0
-  ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+  ECR_REGISTRY: steps.login-ecr.outputs.registry
+  ECR_REPOSITORY: secrets.REPO_NAME
   IMAGE_TAG: latest
 
 
