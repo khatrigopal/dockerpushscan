@@ -77,9 +77,10 @@ jobs:
       id: ecr
       uses: jwalton/gh-ecr-push@v1
       with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-          image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}     
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: us-east-1
+          local-image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }
+          image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }  
     
     
