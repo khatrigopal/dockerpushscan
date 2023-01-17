@@ -81,7 +81,7 @@ jobs:
           access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           region: us-east-1
-          local-image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }
-          image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }  
+          local-image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} 
     
     
