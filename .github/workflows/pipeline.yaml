@@ -1,14 +1,12 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Workflow1
-# Controls when the workflow will run
+name: BuildScanPushDockerImage
+
+
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
-    inputs: 
-      workflow2_name:
-        description: 'Workflow2 Name for Triggering'
-        required: true
-        default: 'Workflow2'
     
 env:
   TRIVY_VERSION: 0.34.0
@@ -59,6 +57,12 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: 'trivy-results-docker.sarif'
- 
     
-
+     
+    - name: PUSH Image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+        IMAGE_TAG: latest
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
