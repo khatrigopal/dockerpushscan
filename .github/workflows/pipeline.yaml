@@ -75,13 +75,13 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
     - name: push to ecr
-      id: ecr
-      uses: jwalton/gh-ecr-push@v1
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
       with:
           access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           region: us-east-1
-          local-image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
           image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} 
     
     
