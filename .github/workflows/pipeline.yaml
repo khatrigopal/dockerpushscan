@@ -75,10 +75,11 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
     - name: push to ecr
+      uses: redhat-actions/push-to-registry@v2
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-      run: |
-        docker push  $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+      with:
+         image: ${{ steps.build-image.outputs.image }}
     
     
