@@ -2,6 +2,7 @@
 
 name: BuildScanPushDockerImage
 
+
 on:
   push:
     branches: [ main ]
