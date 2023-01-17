@@ -64,12 +64,10 @@ jobs:
       name: test
     needs: build_image_push_to_ECR
     steps:
-      -uses: hands-lab/push-ecr-action@v1
-       with:
-        image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-         run: |
-             docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} 
-    
-     
+      - uses: hands-lab/push-ecr-action@v1
+        with:
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          image: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}     
     
     
