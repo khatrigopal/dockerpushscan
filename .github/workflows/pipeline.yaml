@@ -1,11 +1,15 @@
 # This is a basic workflow to help you get started with Actions
 
-name: BuildScanPushDockerImage
+name: Workflow1
 
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs: 
+      workflow2_name:
+        description: 'Workflow2 Name for Triggering'
+        required: true
+        default: 'Workflow2'
     
 env:
   TRIVY_VERSION: 0.34.0
