@@ -74,7 +74,8 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
     - name: push to ecr
-      uses: hands-lab/push-ecr-action@v1
+      id: ecr
+      uses: jwalton/gh-ecr-push@v1
       with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
