@@ -38,8 +38,7 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
         
-    
-        
+          
     
           
     - name: Install Trivy
