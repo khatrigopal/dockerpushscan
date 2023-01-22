@@ -31,6 +31,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
       
     - name: Build, tag, and push image to Amazon ECR
+      id: docker-build
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
@@ -57,7 +58,8 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: 'trivy-results-docker.sarif'
-    
+        
+       
   Push-to-ECR:
     runs-on: ubuntu-18.04
     environment: 
@@ -76,6 +78,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
     # see: https://github.com/aws-actions/amazon-ecr-login
     - name: Build, tag, and push image to Amazon ECR
+      id: docker-build
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
