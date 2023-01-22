@@ -36,7 +36,7 @@ jobs:
         IMAGE_TAG: latest
       run: |
         docker build myimage .
-        docker -t myimage $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+        docker -t myimage $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
    
           
     
