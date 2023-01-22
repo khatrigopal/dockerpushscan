@@ -27,17 +27,18 @@ jobs:
         aws-region: us-east-1
     # see: https://github.com/aws-actions/amazon-ecr-login
     - name: Log in to Amazon ECR
-      id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       
     - name: Build, tag, and push image to Amazon ECR
-      id: docker-build
+      id: ecr
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+        
+    
         
     
           
@@ -78,7 +79,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
     # see: https://github.com/aws-actions/amazon-ecr-login
     - name: Build, tag, and push image to Amazon ECR
-      id: docker-build
+      id: ecr
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
