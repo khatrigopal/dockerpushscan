@@ -35,7 +35,7 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-        docker build --name myimage .
+        docker build -name myimage .
         docker -t myimage $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
    
           
