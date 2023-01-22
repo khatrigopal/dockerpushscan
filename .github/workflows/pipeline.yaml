@@ -6,7 +6,6 @@ name: BuildScanPushDockerImage
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
     
 env:
   TRIVY_VERSION: 0.34.0
@@ -27,6 +26,7 @@ jobs:
         aws-region: us-east-1
     # see: https://github.com/aws-actions/amazon-ecr-login
     - name: Log in to Amazon ECR
+      id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
       
     - name: Build, tag, and push image to Amazon ECR
@@ -37,7 +37,6 @@ jobs:
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
         
-          
     
           
     - name: Install Trivy
@@ -57,32 +56,12 @@ jobs:
       uses: github/codeql-action/upload-sarif@v2
       with:
         sarif_file: 'trivy-results-docker.sarif'
-        
-       
-  Push-to-ECR:
-    runs-on: ubuntu-18.04
-    environment: 
-      name: test
-    needs: build_image_push_to_ECR
-    steps:
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-    # see: https://github.com/aws-actions/amazon-ecr-login
-    - name: Log in to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-    # see: https://github.com/aws-actions/amazon-ecr-login
-    - name: Build, tag, and push image to Amazon ECR
-      id: ecr
+    
+     
+    - name: PUSH Image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} 
-    
-    
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
