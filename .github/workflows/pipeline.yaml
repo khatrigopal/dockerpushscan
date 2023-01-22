@@ -35,14 +35,10 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+        docker build myimage .
+        docker -t myimage $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
    
-    - name: 'Upload Artifact'
-      uses: actions/upload-artifact@v3
-      with:
-          name: my-artifact
-          path: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-        
+          
     
           
     - name: Install Trivy
