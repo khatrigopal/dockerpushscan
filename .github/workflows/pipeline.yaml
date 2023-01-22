@@ -61,6 +61,8 @@ jobs:
   push:
     runs-on: ubuntu-18.04
     needs: build_image_push_to_ECR
+    environment:
+     name: test
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -77,7 +79,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
       
     - name: Build, tag, and push image to Amazon ECR
-      working-directory: $ {{ GITHUB_WORKSPACE }}
+      working-directory: $GITHUB_WORKSPACE
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
