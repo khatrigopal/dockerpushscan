@@ -49,9 +49,8 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-       #  trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL --exit-code 0 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-          trivy image --format table --severity MEDIUM,HIGH,CRITICAL --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-          continue-on-error: true
+        trivy --exit-code 1 --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+        continue-on-error: true
 
 
     - name: Notify if critical vulnerabilities are found
@@ -62,17 +61,6 @@ jobs:
       run: |
          aws sns publish --topic-arn $SNS_TOPIC_ARN --region $AWS_REGION --message "Critical vulnerabilities found in Docker image"
 
-         
-    #- name: Upload Trivy scan results to GitHub Security tab
-     # uses: github/codeql-action/upload-sarif@v2
-      #with:
-       # sarif_file: 'trivy-results-docker.sarif'
-
-      #- name: Image Scan
-        
-    
-    
-     
     - name: PUSH Image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
