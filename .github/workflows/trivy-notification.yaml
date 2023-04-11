@@ -53,8 +53,8 @@ jobs:
          #trivy image --format table --severity MEDIUM,HIGH,CRITICAL --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           trivy image --severity MEDIUM "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           
-    - name: Send SNS notification for vulnerabilities
-      uses: easingthemes/aws-sns-action@v1
+    - name: Publish SNS Topic
+      uses: nothingalike/sns-publish-topic@v1.6
       with:
          TOPIC_ARN: "arn:aws:sns:us-east-1:558940753150:test-trivy"
          MESSAGE: "Critical vulnerabilities found in my-docker-image:latest"
