@@ -42,12 +42,17 @@ jobs:
       run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
     
-    - name: Trivy Scan
-      uses: aquasecurity/trivy-action@v2
-      with:
-          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
-          format: json
-          exit-code-on-high-severity: true  
+    - name : Trivy Scan
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+        IMAGE_TAG: latest
+      run: |
+         #trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL --exit-code 0 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         #trivy image --format table --severity MEDIUM,HIGH,CRITICAL --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+          trivy image --exit-code-on-high-severity true "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+    
+    
       
     - name: Check Trivy Scan Results
       id: trivy-scan-results
