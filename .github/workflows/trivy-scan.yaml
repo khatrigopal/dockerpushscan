@@ -81,7 +81,7 @@ jobs:
           AWS_REGION: us-east-1
           TOPIC_ARN: "arn:aws:sns:us-east-1:558940753150:test-trivy"
           MESSAGE: "Vulnerabilities found in my-docker-image:latest"
-        if: steps.trivy-scan-results.outputs.scan_result == 'failed
+      if: steps.trivy-scan-results.outputs.scan_result == 'failed
       
       
     
