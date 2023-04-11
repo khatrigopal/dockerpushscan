@@ -68,7 +68,7 @@ jobs:
       #with:
        # sarif_file: 'trivy-results-docker.sarif'
 
-      - name: Image Scan
+      #- name: Image Scan
         
     
     
