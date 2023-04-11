@@ -57,6 +57,7 @@ jobs:
       with:
         sarif_file: 'trivy-results-docker.sarif'
     
+    
      
     - name: PUSH Image to Amazon ECR
       env:
