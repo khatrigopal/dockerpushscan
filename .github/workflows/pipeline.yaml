@@ -49,18 +49,22 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-        trivy --format json --output /tmp/report.json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}" || echo "No vulnerabilities found."
+        trivy --format json --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}" > trivy-results.json
         #trivy image --exit-code 1 --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
       continue-on-error: true
 
-
-    - name: Notify if critical vulnerabilities are found
-      if: steps.trivy.outputs.exit_code == '1' && contains(steps.trivy.outputs.stdout, 'CRITICAL')
-      env:
-         AWS_REGION: us-east-1
-         SNS_TOPIC_ARN: arn:aws:sns:us-east-1:558940753150:test-trivy
-      run: |
-         aws sns publish --topic-arn $SNS_TOPIC_ARN --region $AWS_REGION --message "Critical vulnerabilities found in Docker image"
+    - name: Send SNS Notification for Vulnerabilities
+      uses: aws-actions/aws-cli@v2
+      if: ${{ job.status == 'failure' }}
+      with:
+        args: sns publish --topic-arn arn:aws:sns:us-east-1:558940753150:test-trivy --subject "Trivy scan found vulnerabilities in my-docker-image:latest" --message file://trivy-results.json
+    #- name: Notify if critical vulnerabilities are found
+     # if: steps.trivy.outputs.exit_code == '1' && contains(steps.trivy.outputs.stdout, 'CRITICAL')
+      #env:
+       #  AWS_REGION: us-east-1
+        # SNS_TOPIC_ARN: arn:aws:sns:us-east-1:558940753150:test-trivy
+      #run: |
+       #  aws sns publish --topic-arn $SNS_TOPIC_ARN --region $AWS_REGION --message "Critical vulnerabilities found in Docker image"
 
     - name: PUSH Image to Amazon ECR
       env:
