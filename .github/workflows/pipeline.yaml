@@ -45,10 +45,10 @@ jobs:
     - name: Image Scan
       id: trivy
       env:
-       	 ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      	 ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
-       	 IMAGE_TAG: latest
-       run: |
+       	ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+        IMAGE_TAG: latest
+      run: |
        #  trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL --exit-code 0 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
         # #trivy image --format table --severity MEDIUM,HIGH,CRITICAL --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           trivy --exit-code 1 --severity HIGH,CRITICAL my-image:latest
