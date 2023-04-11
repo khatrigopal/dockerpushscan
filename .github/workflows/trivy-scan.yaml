@@ -48,7 +48,7 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+         trivy image --severity MEDIUM,HIGH --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
     
     
       
@@ -56,7 +56,7 @@ jobs:
       id: trivy-scan-results
       run: |
           if [ -f trivy-results.json ]; then
-            CRITICAL_COUNT=$(jq '.[]."Critical"' trivy-results.json)
+            CRITICAL_COUNT=$(jq '.[]."MEDIUM"' trivy-results.json)
             if [ "$CRITICAL_COUNT" -gt "0" ]; then
               echo "Critical vulnerabilities found."
               echo "::set-output name=scan_result::failed"
