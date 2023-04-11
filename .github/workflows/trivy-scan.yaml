@@ -80,12 +80,8 @@ jobs:
       
     - name: Send SNS Notification
       #uses: easingthemes/aws-sns-action@v1
-      with:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-          TOPIC_ARN: "arn:aws:sns:us-east-1:558940753150:test-trivy"
-          MESSAGE: "Vulnerabilities found in my-docker-image:latest"
+      run: |
+        aws sns publish --topic-arn "arn:aws:sns:us-east-1:558940753150:test-trivy" --message " vulnerabilities found in my-app:${{ github.sha }}"
       if: steps.trivy-scan-results.outputs.scan_result == 'failed'
       
       
