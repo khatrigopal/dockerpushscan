@@ -79,7 +79,7 @@ jobs:
           
       
     - name: Send SNS Notification
-      uses: easingthemes/aws-sns-action@v1
+      #uses: easingthemes/aws-sns-action@v1
       with:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
