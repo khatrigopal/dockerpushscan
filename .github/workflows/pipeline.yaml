@@ -53,6 +53,7 @@ jobs:
         trivy image --format table --severity MEDIUM,HIGH,CRITICAL --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           continue-on-error: true
 
+
     - name: Notify if critical vulnerabilities are found
       if: steps.trivy.outputs.exit_code == '1' && contains(steps.trivy.outputs.stdout, 'CRITICAL')
       env:
