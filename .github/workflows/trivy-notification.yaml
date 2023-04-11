@@ -42,7 +42,8 @@ jobs:
       run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
         
-    - name: Scan for vulnerabilities with Trivy
+    #- name: Scan for vulnerabilities with Trivy
+    - name : Trivy Scan
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
@@ -53,7 +54,8 @@ jobs:
           trivy image --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           
     - name: Send SNS notification for vulnerabilities
-      if: ${{ env.TRIVY_EXIT_CODE != 0 }}
+      #if: ${{ env.TRIVY_EXIT_CODE != 0 }}
+      if: steps.trivy.outputs.vulnerabilities_critical + steps.trivy.outputs.vulnerabilities_high + steps.trivy.outputs.vulnerabilities_medium > 0
       run: |
           # Send SNS notification for high vulnerabilities
           aws sns publish --topic-arn "arn:aws:sns:us-east-1:558940753150:test-trivy" --message "Medium vulnerabilities found in $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"      
