@@ -43,7 +43,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
     
     - name: Trivy Scan
-      uses: aquasecurity/trivy-action@v1
+      uses: aquasecurity/trivy-action@v2
       with:
           image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
           format: json
