@@ -50,7 +50,7 @@ jobs:
         IMAGE_TAG: latest
       run: |
         trivy image --exit-code 1 --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-        continue-on-error: true
+        #continue-on-error: true
 
 
     - name: Notify if critical vulnerabilities are found
