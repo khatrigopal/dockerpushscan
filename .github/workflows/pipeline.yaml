@@ -5,7 +5,7 @@ name: BuildScanPushDockerImage
 on:
   push:
     branches: [ main ]
-  
+ 
  
 env:
   TRIVY_VERSION: 0.34.0
