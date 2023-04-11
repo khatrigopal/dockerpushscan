@@ -1,0 +1,96 @@
+# This is a basic workflow to help you get started with Actions
+
+name: BuildScanPushDockerImage
+
+on:
+  push:
+    branches: [ master ]
+ 
+env:
+  TRIVY_VERSION: 0.34.0
+  
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_image_push_to_ECR:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    # see: https://github.com/aws-actions/configure-aws-credentials
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    # see: https://github.com/aws-actions/amazon-ecr-login
+    - name: Log in to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+        
+    
+          
+    - name: Install Trivy
+      run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v${{ env.TRIVY_VERSION }}
+    
+    - name: Trivy Scan
+      uses: aquasecurity/trivy-action@v1
+      with:
+          image-ref: $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
+          format: json
+          exit-code-on-high-severity: true  
+      
+    - name: Check Trivy Scan Results
+      id: trivy-scan-results
+      run: |
+          if [ -f trivy-results.json ]; then
+            CRITICAL_COUNT=$(jq '.[]."Critical"' trivy-results.json)
+            if [ "$CRITICAL_COUNT" -gt "0" ]; then
+              echo "Critical vulnerabilities found."
+              echo "::set-output name=scan_result::failed"
+            else
+              HIGH_COUNT=$(jq '.[]."High"' trivy-results.json)
+              if [ "$HIGH_COUNT" -gt "0" ]; then
+                echo "High vulnerabilities found."
+                echo "::set-output name=scan_result::failed"
+              else
+                echo "No vulnerabilities found."
+                echo "::set-output name=scan_result::success"
+              fi
+            fi
+          else
+            echo "Failed to get Trivy scan results."
+            echo "::set-output name=scan_result::failed"
+          fi
+          
+      
+    - name: Send SNS Notification
+      uses: easingthemes/aws-sns-action@v1
+      with:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+          TOPIC_ARN: "arn:aws:sns:us-east-1:558940753150:test-trivy"
+          MESSAGE: "Vulnerabilities found in my-docker-image:latest"
+        if: steps.trivy-scan-results.outputs.scan_result == 'failed
+      
+      
+    
+     
+    - name: PUSH Image to Amazon ECR
+      if: ${{ env.TRIVY_EXIT_CODE == 0 }}
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
+        IMAGE_TAG: latest
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
