@@ -51,15 +51,16 @@ jobs:
       run: |
          #trivy image --format sarif --template "@contrib/sarif.tpl" -o trivy-results-docker.sarif  --severity MEDIUM,HIGH,CRITICAL --exit-code 0 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
          #trivy image --format table --severity MEDIUM,HIGH,CRITICAL --exit-code 1 "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
-          trivy image --severity MEDIUM,HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
+          trivy image --severity MEDIUM "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           
     - name: Send SNS notification for vulnerabilities
+      uses: easingthemes/aws-sns-action@v1
+      with:
+         TOPIC_ARN: "arn:aws:sns:us-east-1:558940753150:test-trivy"
+         MESSAGE: "Critical vulnerabilities found in my-docker-image:latest"
       #if: ${{ env.TRIVY_EXIT_CODE != 0 }}
       if: steps.trivy.outputs.vulnerabilities_medium > 0
-      run: |
-          # Send SNS notification for high vulnerabilities
-          aws sns publish --topic-arn "arn:aws:sns:us-east-1:558940753150:test-trivy" --message "Medium vulnerabilities found in $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"      
-    
+      
       
     
      
