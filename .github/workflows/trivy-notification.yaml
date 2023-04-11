@@ -53,8 +53,8 @@ jobs:
           trivy --severity HIGH,CRITICAL "$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"
           
     - name: Send SNS notification for vulnerabilities
-        if: ${{ env.TRIVY_EXIT_CODE != 0 }}
-        run: |
+      if: ${{ env.TRIVY_EXIT_CODE != 0 }}
+      run: |
           # Send SNS notification for high vulnerabilities
           aws sns publish --topic-arn "arn:aws:sns:us-east-1:558940753150:test-trivy" --message "Medium vulnerabilities found in $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}"      
     
