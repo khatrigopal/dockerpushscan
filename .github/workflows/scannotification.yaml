@@ -48,12 +48,12 @@ jobs:
         ECR_REPOSITORY: ${{ secrets.REPO_NAME }}
         IMAGE_TAG: latest
       run: |
-         trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:latest" --exit-code 0 || echo "Trivy scan completed"
+         trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --exit-code 0 || echo "Trivy scan completed"
          
     - name: Send SNS Notification for Critical Vulnerabilities
       if: ${{ always() }}
       run: |
-          trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:latest" --severity CRITICAL --format json \
+          trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --severity CRITICAL --format json \
           | jq '.[] | "Critical vulnerability found: \(.VulnerabilityID) \(.Title) \(.Severity)"' \
           | xargs -I {} aws sns publish --topic-arn arn:aws:sns:us-east-1:558940753150:test-trivy --message {}
 
@@ -65,7 +65,7 @@ jobs:
     - name: Send SNS Notification for High Vulnerabilities
       if: ${{ always() }}
       run: |
-          trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:latest" --severity HIGH --format json \
+          trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --severity HIGH --format json \
           | jq '.[] | "High vulnerability found: \(.VulnerabilityID) \(.Title) \(.Severity)"' \
           | xargs -I {} aws sns publish --topic-arn arn:aws:sns:us-east-1:558940753150:test-trivy --message HIGH VA
       env:
