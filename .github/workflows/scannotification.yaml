@@ -53,7 +53,7 @@ jobs:
     - name: Send SNS Notification for Critical Vulnerabilities
       if: ${{ always() }}
       run: |
-          trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --severity MEDIUM --format json \
+          trivy image "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" --severity MEDIUM --format json 
          # | jq '.[] | "Critical vulnerability found: \(.VulnerabilityID) \(.Title) \(.Severity)"' \
          # | xargs -I {} aws sns publish --topic-arn arn:aws:sns:us-east-1:558940753150:test-trivy --message {}
 
